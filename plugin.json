@@ -1,0 +1,5 @@
+{
+  "name": "Example Plugin",
+  "author": "John Doe",
+  "flags": ["debug", "_root"]
+}
