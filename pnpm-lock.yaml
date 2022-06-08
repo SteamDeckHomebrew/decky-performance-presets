@@ -8,7 +8,7 @@ specifiers:
   '@rollup/plugin-typescript': ^8.3.2
   '@types/react': 16.14.0
   '@types/webpack': ^5.28.0
-  decky-frontend-lib: ^0.7.0
+  decky-frontend-lib: '*'
   react-icons: ^4.3.1
   rollup: ^2.70.2
   rollup-plugin-import-assets: ^1.1.1
@@ -17,7 +17,7 @@ specifiers:
   typescript: ^4.6.4
 
 dependencies:
-  decky-frontend-lib: 0.7.0
+  decky-frontend-lib: 0.7.2
   react-icons: 4.4.0
 
 devDependencies:
@@ -371,8 +371,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001350
-      electron-to-chromium: 1.4.148
+      caniuse-lite: 1.0.30001351
+      electron-to-chromium: 1.4.149
       escalade: 3.1.1
       node-releases: 2.0.5
       picocolors: 1.0.0
@@ -387,8 +387,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /caniuse-lite/1.0.30001350:
-    resolution: {integrity: sha512-NZBql38Pzd+rAu5SPXv+qmTWGQuFsRiemHCJCAPvkoDxWV19/xqL2YHF32fDJ9SDLdLqfax8+S0CO3ncDCp9Iw==}
+  /caniuse-lite/1.0.30001351:
+    resolution: {integrity: sha512-u+Ll+RDaiQEproTQjZLjZwyfNgNezA1fERMT7/54npcz+PkbVJUAHXMUz4bkXQYRPWrcFNO0Fbi1mwjfXg6N5g==}
     dev: true
 
   /chrome-trace-event/1.0.3:
@@ -412,8 +412,8 @@ packages:
     resolution: {integrity: sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==}
     dev: true
 
-  /decky-frontend-lib/0.7.0:
-    resolution: {integrity: sha512-BNHBLBnq03d8e2k/h9/iOVSE/wlytnQYgZBuWwTT2MHT0NHqWKdN+lRqyeVf6NcI14zcLfSmwx5Q8kMlJTi1Hw==}
+  /decky-frontend-lib/0.7.2:
+    resolution: {integrity: sha512-9MLIb5K1Nwwer89LgD17INT4kTQHlqf2Y7GNRf8ESTkYGfgLSO5yLOHzzzUq5MvI7pyru9ZopYd9ldGRk7epMg==}
     dev: false
 
   /deepmerge/4.2.2:
@@ -421,8 +421,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /electron-to-chromium/1.4.148:
-    resolution: {integrity: sha512-8MJk1bcQUAYkuvCyWZxaldiwoDG0E0AMzBGA6cv3WfuvJySiPgfidEPBFCRRH3cZm6SVZwo/oRlK1ehi1QNEIQ==}
+  /electron-to-chromium/1.4.149:
+    resolution: {integrity: sha512-SR6ZQ8gfXX7LIS3UTDXu1CbFMUnluP3TS+jP7QwDwOnoH5CcHbejFdaaaEnGxR6I76E55eFnUV9mxI8GKufkEg==}
     dev: true
 
   /enhanced-resolve/5.9.3:
@@ -679,6 +679,9 @@ packages:
     resolution: {integrity: sha512-fSbvHeVYo/B5/L4VhB7sBA1i2tS8MkT0Hb9t2H1AVPkwGfVHLJCqyr2Py9dKMxsyM63Eng1GkdZfbWj+Fmv8Rg==}
     peerDependencies:
       react: '*'
+    peerDependenciesMeta:
+      react:
+        optional: true
     dev: false
 
   /rechoir/0.6.2:
