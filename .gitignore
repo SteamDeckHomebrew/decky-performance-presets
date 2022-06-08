@@ -26,6 +26,8 @@ bower_components
 # Editors
 .idea
 *.iml
+*.code-workspace
+.vscode
 
 # OS metadata
 .DS_Store
