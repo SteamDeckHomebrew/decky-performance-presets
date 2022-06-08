@@ -1,5 +1,5 @@
 {
-  "name": "Example Plugin",
+  "name": "Performance Presets",
   "author": "John Doe",
   "flags": ["debug", "_root"]
 }
