@@ -5,7 +5,9 @@ import {
   DropdownOption,
   ServerAPI,
   staticClasses,
-  PanelSection
+  PanelSection,
+  HorizontalFocus,
+  ButtonItem,
 } from "decky-frontend-lib";
 import { VFC, useState, useEffect, Fragment } from "react";
 import { MdSpeed } from "react-icons/md";
@@ -44,12 +46,12 @@ function updateRunningGames(update: GameStateUpdate) {
 }
 
 const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
-  let selectedProfile = 0;
   const [selectedGame, setSelectedGame] = useState<number | null>(null);
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOption[]>([]);
-  const [displayedProfile, setdisplayedProfile] = useState<ShareDeck.ShareDeckProfile | null>(null);
+  const [fetchedProfiles, setFetchedProfiles] = useState<ShareDeck.ShareDeckProfile[] | null>(null);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
-
+  const [selectedProfile, setSelectedProfile] = useState<number>(0);
+  
   useEffect(() => {
     dropdownUpdateFunc = () => {
       setDropdownOptions(runningGames.map(g => {return {data: g.appid ,label: g.display_name} as DropdownOption}));
@@ -74,13 +76,13 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
     if(appid !== null) {
       ShareDeck.fetchProfilesFromAppID(appid)
         .then(profiles => {
-          selectedProfile = 0
-          setdisplayedProfile(profiles[selectedProfile]);
+          setFetchedProfiles(profiles);
+          setSelectedProfile(0);
           setLoadingProfile(false);
         });
       setLoadingProfile(true);
     } else {
-      setdisplayedProfile(null);
+      setFetchedProfiles(null);
     }
   }
 
@@ -96,7 +98,40 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
         </PanelSectionRow>
       </PanelSection>
 
-      <PerfDisplay profile={displayedProfile} loading={loadingProfile} />
+      <PanelSection>
+        <PanelSectionRow>
+          <HorizontalFocus>
+            <ButtonItem
+              onClick={() => {
+                if(fetchedProfiles) {
+                  if(selectedProfile === 0) {
+                    setSelectedProfile(fetchedProfiles.length - 1);
+                  } else {
+                    setSelectedProfile(selectedProfile - 1);
+                  }
+                }
+              }}
+            >
+              Prev
+            </ButtonItem>
+            <ButtonItem
+              onClick={() => {
+                if(fetchedProfiles) {
+                  if(selectedProfile === fetchedProfiles.length - 1) {
+                    setSelectedProfile(0);
+                  } else {
+                    setSelectedProfile(selectedProfile + 1);
+                  }
+                }
+              }}
+            >
+              Next
+            </ButtonItem>
+          </HorizontalFocus>
+        </PanelSectionRow>
+      </PanelSection>
+
+      <PerfDisplay profile={fetchedProfiles? fetchedProfiles[selectedProfile]:null} loading={loadingProfile} />
     </Fragment>
   );
 };
