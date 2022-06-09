@@ -1,6 +1,7 @@
 import {
   definePlugin,
-  DropdownItem,
+  PanelSectionRow,
+  Dropdown,
   DropdownOption,
   ServerAPI,
   staticClasses,
@@ -36,7 +37,6 @@ function updateRunningGames(update: GameStateUpdate) {
     runningGames = runningGames.filter(g => g.appid !== update.unAppID);
   }
   dropdownUpdateFunc();
-  console.log(runningGames, runningGames.map(g => {return {data: g.appid ,label: g.display_name}}));
 }
 
 const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
@@ -46,20 +46,28 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
   useEffect(() => {
     dropdownUpdateFunc = () => {
       setDropdownOptions(runningGames.map(g => {return {data: g.appid ,label: g.display_name} as DropdownOption}));
+
+      let topRunningGame: AppOverview | undefined = runningGames[runningGames.length - 1];
+      setSelectedGame(topRunningGame ? topRunningGame.appid : null);
     }
     
+    dropdownUpdateFunc();
+
     return () => {
       dropdownUpdateFunc = () => {};
     }
   }, []);
 
   return (
-    <DropdownItem
-      label="Select a game"
-      rgOptions={dropdownOptions}
-      selectedOption={selectedGame}
-      onChange={(data) => setSelectedGame(data.data)}
-    />
+    <PanelSectionRow>
+      <Dropdown
+        rgOptions={dropdownOptions}
+        selectedOption={selectedGame}
+        onChange={(data) => {
+          setSelectedGame(data.data);
+        }}
+      />
+    </PanelSectionRow>
   );
 };
 
