@@ -1,105 +1,72 @@
 import {
-  ButtonItem,
   definePlugin,
-  DialogButton,
-  Menu,
-  MenuItem,
-  PanelSection,
-  PanelSectionRow,
-  Router,
+  DropdownItem,
+  DropdownOption,
   ServerAPI,
-  showContextMenu,
   staticClasses,
 } from "decky-frontend-lib";
-import { VFC } from "react";
-import { FaShip } from "react-icons/fa";
+import { VFC, useState, useEffect } from "react";
+import { MdSpeed } from "react-icons/md";
 
-import logo from "../assets/logo.png";
+interface GameStateUpdate {
+  unAppID: number;
+  nInstanceID: number;
+  bRunning: boolean;
+}
 
-// interface AddMethodArgs {
-//   left: number;
-//   right: number;
-// }
+interface AppOverview {
+  appid: number;
+  display_name: string;
+}
 
-const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
-  // const [result, setResult] = useState<number | undefined>();
+let runningGames: AppOverview[] = [];
+let dropdownUpdateFunc: Function = () => {};
 
-  // const onClick = async () => {
-  //   const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
-  //     "add",
-  //     {
-  //       left: 2,
-  //       right: 2,
-  //     }
-  //   );
-  //   if (result.success) {
-  //     setResult(result.result);
-  //   }
-  // };
+//@ts-ignore
+SteamClient.GameSessions.RegisterForAppLifetimeNotifications(updateRunningGames);
+
+function updateRunningGames(update: GameStateUpdate) {
+  if(update.bRunning) {
+    //@ts-ignore
+    let gameInfo: AppOverview = appStore.GetAppOverviewByAppID(update.unAppID);
+    if(!gameInfo)
+      return;
+    runningGames.push(gameInfo);
+  } else {
+    runningGames = runningGames.filter(g => g.appid !== update.unAppID);
+  }
+  dropdownUpdateFunc();
+  console.log(runningGames, runningGames.map(g => {return {data: g.appid ,label: g.display_name}}));
+}
+
+const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
+  const [selectedGame, setSelectedGame] = useState<number | null>(null);
+  const [dropdownOptions, setDropdownOptions] = useState<DropdownOption[]>([]);
+
+  useEffect(() => {
+    dropdownUpdateFunc = () => {
+      setDropdownOptions(runningGames.map(g => {return {data: g.appid ,label: g.display_name} as DropdownOption}));
+    }
+    
+    return () => {
+      dropdownUpdateFunc = () => {};
+    }
+  }, []);
 
   return (
-    <PanelSection title="Panel Section">
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={(e) =>
-            showContextMenu(
-              <Menu label="Menu" cancelText="CAAAANCEL" onCancel={() => {}}>
-                <MenuItem onSelected={() => {}}>Item #1</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #2</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #3</MenuItem>
-              </Menu>,
-              e.currentTarget ?? window
-            )
-          }
-        >
-          Server says yolo
-        </ButtonItem>
-      </PanelSectionRow>
-
-      <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} />
-        </div>
-      </PanelSectionRow>
-
-      <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={() => {
-            Router.CloseSideMenus();
-            Router.Navigate("/decky-plugin-test");
-          }}
-        >
-          Router
-        </ButtonItem>
-      </PanelSectionRow>
-    </PanelSection>
-  );
-};
-
-const DeckyPluginRouterTest: VFC = () => {
-  return (
-    <div style={{ marginTop: "50px", color: "white" }}>
-      Hello World!
-      <DialogButton onClick={() => Router.NavigateToStore()}>
-        Go to Store
-      </DialogButton>
-    </div>
+    <DropdownItem
+      label="Select a game"
+      rgOptions={dropdownOptions}
+      selectedOption={selectedGame}
+      onChange={(data) => setSelectedGame(data.data)}
+    />
   );
 };
 
 export default definePlugin((serverApi: ServerAPI) => {
-  serverApi.routerHook.addRoute("/decky-plugin-test", DeckyPluginRouterTest, {
-    exact: true,
-  });
-
   return {
-    title: <div className={staticClasses.Title}>Example Plugin</div>,
+    title: <div className={staticClasses.Title}>Performance Presets</div>,
     content: <Content serverAPI={serverApi} />,
-    icon: <FaShip />,
-    onDismount() {
-      serverApi.routerHook.removeRoute("/decky-plugin-test");
-    },
+    icon: <MdSpeed />,
   };
 });
