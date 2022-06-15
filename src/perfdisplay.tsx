@@ -3,16 +3,18 @@ import {
   PanelSection,
   gamepadDialogClasses,
   joinClassNames,
-  Spinner
+  Spinner,
+  Focusable
 } from "decky-frontend-lib";
-import { Component, Fragment } from "react";
+import { Component, Fragment, ReactElement } from "react";
+import { FaStar } from "react-icons/fa";
 
 import { ShareDeckProfile } from "./sharedeck";
 
 
 
 
-class PerfDisplayItem extends Component<{ label: string, value: string | number | undefined }, {}> {
+class PerfDisplayItem extends Component<{ label: string | ReactElement, value: string | number | undefined}, {}> {
   render() {
 
     return (
@@ -32,7 +34,7 @@ class PerfDisplayItem extends Component<{ label: string, value: string | number 
   }
 }
 
-export class PerfDisplay extends Component<{ profile: ShareDeckProfile | null, loading: boolean }> {
+export class PerfDisplay extends Component<{ profile: ShareDeckProfile | null, loading: boolean, errorMsg: string | null }> {
   render() {
     if(this.props.loading) {
       return (
@@ -44,9 +46,46 @@ export class PerfDisplay extends Component<{ profile: ShareDeckProfile | null, l
       )
     }
 
+    if(this.props.errorMsg !== null) {
+      return (
+        <PanelSection>
+          <PanelSectionRow>
+            {this.props.errorMsg}
+          </PanelSectionRow>
+        </PanelSection>
+      )
+    }
+
     if (this.props.profile) {
+      console.log(this.props.profile);
       return (
         <Fragment>
+          <PanelSection>
+            <Focusable
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <div className={gamepadDialogClasses.FieldLabelRow}>
+                <div className={gamepadDialogClasses.FieldLabel}>
+                  Created by:&nbsp;
+                </div>
+                <div className={gamepadDialogClasses.FieldChildren}>
+                  {this.props.profile.user.personaname}
+                </div>
+              </div>
+              <div className={gamepadDialogClasses.FieldLabelRow}>
+                <div className={gamepadDialogClasses.FieldLabel}>
+                  <FaStar />
+                </div>
+                <div className={gamepadDialogClasses.FieldChildren}>
+                  {this.props.profile.favourites_count}
+                </div>
+              </div>
+            </Focusable>
+          </PanelSection>
           <PanelSection title="Recommended Steam Deck Settings">
               <PerfDisplayItem label="Expected Power Draw" value={`${this.props.profile?.power_draw}W`} />
               <PerfDisplayItem label="Framerate Limit" value={this.props.profile?.framerate_limit} />
@@ -66,7 +105,7 @@ export class PerfDisplay extends Component<{ profile: ShareDeckProfile | null, l
           </PanelSection>
 
           <PanelSection>
-            <PerfDisplayItem label="Additional Notes" value={this.props.profile?.note === null ? "None" : this.props.profile?.note} />
+            <PerfDisplayItem label="Additional Notes" value={this.props.profile?.note === null || this.props.profile?.note === "" ? "None" : this.props.profile?.note} />
           </PanelSection>
         </Fragment>
       )

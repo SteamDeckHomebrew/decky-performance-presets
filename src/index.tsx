@@ -6,8 +6,10 @@ import {
   ServerAPI,
   staticClasses,
   PanelSection,
-  HorizontalFocus,
-  ButtonItem,
+  Focusable,
+  DialogButton,
+  gamepadDialogClasses,
+  joinClassNames
 } from "decky-frontend-lib";
 import { VFC, useState, useEffect, Fragment } from "react";
 import { MdSpeed } from "react-icons/md";
@@ -51,6 +53,7 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
   const [fetchedProfiles, setFetchedProfiles] = useState<ShareDeck.ShareDeckProfile[] | null>(null);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
   const [selectedProfile, setSelectedProfile] = useState<number>(0);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
   useEffect(() => {
     dropdownUpdateFunc = () => {
@@ -79,15 +82,23 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
           setFetchedProfiles(profiles);
           setSelectedProfile(0);
           setLoadingProfile(false);
-        });
+          setErrorMsg(null);
+        })
+        .catch(err => {
+          setFetchedProfiles(null);
+          setLoadingProfile(false);
+          setErrorMsg(err);
+        })
       setLoadingProfile(true);
     } else {
       setFetchedProfiles(null);
+      setErrorMsg(null);
     }
   }
 
   return (
     <Fragment>
+      <div className={joinClassNames(gamepadDialogClasses.Field, gamepadDialogClasses.WithBottomSeparatorStandard)} style={{height: "10%", overflow:"hidden", paddingBottom: "12px", marginBottom: "12px"}}>
       <PanelSection>
         <PanelSectionRow>
           <Dropdown
@@ -97,41 +108,51 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ }) => {
           />
         </PanelSectionRow>
       </PanelSection>
+      </div>
+      
+      <Focusable
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          marginBottom: "12px",
+          alignItems: "center"
+        }}
+      >
+        <div style={{overflow: "hidden", width: "36%", display:"flex", justifyContent:"center", borderRadius:"2px"}}>
+        <DialogButton
+          onClick={() => {
+            if(fetchedProfiles) {
+              if(selectedProfile === 0) {
+                setSelectedProfile(fetchedProfiles.length - 1);
+              } else {
+                setSelectedProfile(selectedProfile - 1);
+              }
+            }
+          }}
+        >
+          Prev
+        </DialogButton>
+        </div>
+        {fetchedProfiles ? `${selectedProfile+1}/${fetchedProfiles?.length}` : ""}
+        <div style={{overflow: "hidden", width: "36%", display:"flex", justifyContent:"center", borderRadius:"2px"}}>
+        <DialogButton
+          onClick={() => {
+            if(fetchedProfiles) {
+              if(selectedProfile === fetchedProfiles.length - 1) {
+                setSelectedProfile(0);
+              } else {
+                setSelectedProfile(selectedProfile + 1);
+              }
+            }
+          }}
+        >
+          Next
+        </DialogButton>
+        </div>
+      </Focusable>
 
-      <PanelSection>
-        <PanelSectionRow>
-          <HorizontalFocus>
-            <ButtonItem
-              onClick={() => {
-                if(fetchedProfiles) {
-                  if(selectedProfile === 0) {
-                    setSelectedProfile(fetchedProfiles.length - 1);
-                  } else {
-                    setSelectedProfile(selectedProfile - 1);
-                  }
-                }
-              }}
-            >
-              Prev
-            </ButtonItem>
-            <ButtonItem
-              onClick={() => {
-                if(fetchedProfiles) {
-                  if(selectedProfile === fetchedProfiles.length - 1) {
-                    setSelectedProfile(0);
-                  } else {
-                    setSelectedProfile(selectedProfile + 1);
-                  }
-                }
-              }}
-            >
-              Next
-            </ButtonItem>
-          </HorizontalFocus>
-        </PanelSectionRow>
-      </PanelSection>
-
-      <PerfDisplay profile={fetchedProfiles? fetchedProfiles[selectedProfile]:null} loading={loadingProfile} />
+      <PerfDisplay profile={fetchedProfiles? fetchedProfiles[selectedProfile]:null} loading={loadingProfile} errorMsg={errorMsg}/>
     </Fragment>
   );
 };
