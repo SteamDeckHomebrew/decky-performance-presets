@@ -30,7 +30,7 @@ let runningGames: AppOverview[] = [];
 let dropdownUpdateFunc: Function = () => {};
 
 //@ts-ignore
-SteamClient.GameSessions.RegisterForAppLifetimeNotifications(updateRunningGames);
+const unregisterGameUpdates = SteamClient.GameSessions.RegisterForAppLifetimeNotifications(updateRunningGames);
 
 function updateRunningGames(update: GameStateUpdate) {
   if(update.bRunning) {
@@ -141,5 +141,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     title: <div className={staticClasses.Title}>Performance Presets</div>,
     content: <Content serverAPI={serverApi} />,
     icon: <MdSpeed />,
+    onDismount() {
+      unregisterGameUpdates();
+    }
   };
 });
